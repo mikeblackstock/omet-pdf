@@ -33,14 +33,15 @@ const createIframe = (bus, proc, win, cb) => {
   iframe.style.width = '100%';
   iframe.style.height = '100%';
   iframe.setAttribute('border', '0');
-
+  iframe.style.backgroundColor= 'white';
   iframe.addEventListener('load', () => {
     const ref = iframe.contentWindow;
 
     // This will proxy the window focus events to iframe
     win.on('focus', () => ref.focus());
     win.on('blur', () => ref.blur());
-
+	if (window.mobile === true)
+		win.maximize();
     // Create message sending wrapper
     const sendMessage = msg => ref.postMessage(msg, window.location.href);
 
@@ -59,7 +60,7 @@ const createIframe = (bus, proc, win, cb) => {
 
 // Creates the internal callback function when OS.js launches an application
 // Note the first argument is the 'name' taken from your metadata.json file
-OSjs.make('osjs/packages').register('MyIframeApplication', (core, args, options, metadata) => {
+OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata) => {
 
   // Create a new Application instance
   const proc = core.make('osjs/application', {
@@ -72,36 +73,99 @@ OSjs.make('osjs/packages').register('MyIframeApplication', (core, args, options,
   proc.createWindow({
     id: 'MyIframeApplicationWindow',
     title: metadata.title.en_EN,
-    dimension: {width: 400, height: 400},
-    position: {left: 700, top: 200}
+    dimension: {width:760, height: 500},
+    position: 'right'
   })
     .on('destroy', () => proc.destroy())
     .render(($content, win) => {
       // Create a new bus for our messaging
+      if (window.mobile === true)
+		win.maximize();
       const bus = core.make('osjs/event-handler', 'MyIframeApplicationWindow');
 
       // Get path to iframe content
-      const src = proc.resource('/data/index.html');
-
+ //    const src = proc.resource('/data/pdf.js/web/index.html');
+     let src = proc.resource('/data/pdf.js/web/viewer.html?file=vfs/demo/');
       // Create DOM element
       const iframe = createIframe(bus, proc, win, send => {
-        bus.on('yo', (send, args) => send({
-          method: 'yo',
-          args: ['MyIframeApplication says hello']
-        }));
+//{file: {path: 'home://Sheep-May-Safely-Graze/Sheep.ly'}}
 
-        // Send the process ID to our iframe to establish communication
+      	if (proc.args.file) {
+      		const user= core.getUser();
+      		proc.args.username= user.username;
+         	send({
+         	 	method: 'pdf',
+          		args: proc.args
+     	   });
+ 
+ /*
+ 	        bus.on('yo', (send, args) => send({
+  	        method: 'yo',
+
+			
+ 	         args: proc.args 
+	        }));
+*/		
+      	}
+
+		else  {
+			const p= {file: {cmd:'git'}};
+ 	        bus.on('yo', (send, args) => send({
+  	        method: 'yo',
+//          args: ['MyIframeApplication says hello']
+			
+ 	         args: p 
+	        }));
+
+		}
+
+   		proc.on('attention', (newargs) => {
+   			const user= core.getUser();
+//  iframe.src = src + proc.args.path.replace(/^home:\//, ''); 			
+			win.focus();
+//			iframe.src = src + newargs.path.replace(/^home:\//, '') + newargs.zoomString + "?" + Date.now();
+			iframe.src = src + newargs.file.path.replace(/^home:\//, '');
+//			iframe.src = iframe.src + newargs.zoomString;
+
+			if (newargs.file) {
+				newargs.username = user.username;
+        	send({
+         	 	method: 'pdf',
+          		args: newargs
+        	});
+      		}	
+   		});
+ 
+   		win.on('drop', (ev, options) => {
+   			const user= core.getUser();
+   			
+			win.focus();
+			iframe.src = src + options.filename;
+
+   		}); 
+ 
+ // Send the process ID to our iframe to establish communication
+        
         send({
           method: 'init',
+          
           args: [proc.pid]
         });
       });
 
       // Finally set the source and attach
-      iframe.src = src;
+ 
+ //     proc.args.path= proc.args.path.replace('.ly', '.pdf');
+ //	  proc.args.filename= proc.args.filename.replace('.ly', '.pdf');
 
+      
+      if (proc.args.file.zoomString)
+	     iframe.src = src + proc.args.file.path.replace(/^home:\//, '');
+	  else
+	   		iframe.src = src + proc.args.file.path.replace(/^home:\//, '');
       // Attach
       $content.appendChild(iframe);
+      
     });
 
   return proc;

@@ -1,14 +1,19 @@
 {
-  "name": "MyIframeApplication",
-  "category": null,
+  "name": "PDFViewer",
+  "singleton": true,
+  "category": "development",
+  "hidden": true,
   "title": {
-    "en_EN": "My Iframe Application",
-    "fr_FR": "Mon application Iframe"
+    "en_EN": "PDF Viewer",
+    "fr_FR": "PDF Viewer"
   },
   "description": {
-    "en_EN": "My Iframe Application",
-    "fr_FR": "Mon application Iframe"
+    "en_EN": "PDF Viewer",
+    "fr_FR": "PDF Viewer"
   },
+    "mimes": [
+    "application\/pdf"
+  ],
   "files": [
     "main.js"
   ]
