@@ -113,7 +113,7 @@
 "use strict";
 
 
-;
+
 var pdfjsWebApp = void 0,
     pdfjsWebAppOptions = void 0;
 {

@@ -73,11 +73,13 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
   proc.createWindow({
     id: 'MyIframeApplicationWindow',
     title: metadata.title.en_EN,
-    dimension: {width:760, height: 500},
-    position: 'right'
+    dimension: {width: 530, height:450},
+
+    position: {left: 720, top: 32}
   })
     .on('destroy', () => proc.destroy())
     .render(($content, win) => {
+    	const suffix = `?pid=${proc.pid}&wid=${win.wid}`; 
       // Create a new bus for our messaging
       if (window.mobile === true)
 		win.maximize();
@@ -85,7 +87,8 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
 
       // Get path to iframe content
  //    const src = proc.resource('/data/pdf.js/web/index.html');
-     let src = proc.resource('/data/pdf.js/web/viewer.html?file=vfs/demo/');
+     let src = proc.resource('/data/pdf.js/new-web/new-viewer.html' + suffix + '&file=vfs/' + core.getUser().username + "/");
+ 
       // Create DOM element
       const iframe = createIframe(bus, proc, win, send => {
 //{file: {path: 'home://Sheep-May-Safely-Graze/Sheep.ly'}}
@@ -107,18 +110,12 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
 	        }));
 */		
       	}
-
+/*
 		else  {
-			const p= {file: {cmd:'git'}};
- 	        bus.on('yo', (send, args) => send({
-  	        method: 'yo',
-//          args: ['MyIframeApplication says hello']
-			
- 	         args: p 
-	        }));
+			iframe.src = proc.resource('/data/pdf.js/new-web/new-viewer.html?file=Cover.pdf')
 
 		}
-
+*/
    		proc.on('attention', (newargs) => {
    			const user= core.getUser();
 //  iframe.src = src + proc.args.path.replace(/^home:\//, ''); 			
@@ -126,6 +123,8 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
 //			iframe.src = src + newargs.path.replace(/^home:\//, '') + newargs.zoomString + "?" + Date.now();
 			iframe.src = src + newargs.file.path.replace(/^home:\//, '');
 //			iframe.src = iframe.src + newargs.zoomString;
+// http://localhost:8888/apps/PDFViewer/data/pdf.js/new-web/new-viewer.html?file=vfs/demo/Rondo.pdf
+// http://localhost:8888/apps/PDFViewer/data/pdf.js/new-web/new-viewer.html?file=vfs/demo/Rondo.pdf?1586138984003#page-width
 
 			if (newargs.file) {
 				newargs.username = user.username;
@@ -144,6 +143,23 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
 
    		}); 
  
+win.on('iframe:get', msg => {
+
+//this removes leading user directory
+var splitArray= msg.split("/");
+var str='';
+for (var i=1; i < splitArray.length; i++)	{
+	str= str + "/" + splitArray[i];
+}
+
+
+core.broadcast('Editor', 'placeCursor', str, false);
+
+
+ 	
+});   
+
+ 
  // Send the process ID to our iframe to establish communication
         
         send({
@@ -152,6 +168,7 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
           args: [proc.pid]
         });
       });
+
 
       // Finally set the source and attach
  

@@ -7,7 +7,7 @@ module.exports = {
   mode,
   devtool: 'source-map',
   entry: [
-    path.resolve(__dirname, 'index.js'),
+    path.resolve(__dirname, 'pdf.js'),
   ],
   optimization: {
     minimize,

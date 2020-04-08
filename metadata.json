@@ -2,7 +2,7 @@
   "name": "PDFViewer",
   "singleton": true,
   "category": "development",
-  "hidden": true,
+  "hidden": false,
   "title": {
     "en_EN": "PDF Viewer",
     "fr_FR": "PDF Viewer"
