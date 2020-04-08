@@ -73,7 +73,7 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
   proc.createWindow({
     id: 'MyIframeApplicationWindow',
     title: metadata.title.en_EN,
-    dimension: {width: 530, height:450},
+    dimension: {width: 530, height:600},
 
     position: {left: 720, top: 32}
   })
@@ -98,17 +98,9 @@ OSjs.make('osjs/packages').register('PDFViewer', (core, args, options, metadata)
       		proc.args.username= user.username;
          	send({
          	 	method: 'pdf',
-          		args: proc.args
+          		args: proc.args.file
      	   });
  
- /*
- 	        bus.on('yo', (send, args) => send({
-  	        method: 'yo',
-
-			
- 	         args: proc.args 
-	        }));
-*/		
       	}
 /*
 		else  {
@@ -176,10 +168,11 @@ core.broadcast('Editor', 'placeCursor', str, false);
  //	  proc.args.filename= proc.args.filename.replace('.ly', '.pdf');
 
       
-      if (proc.args.file.zoomString)
-	     iframe.src = src + proc.args.file.path.replace(/^home:\//, '');
-	  else
-	   		iframe.src = src + proc.args.file.path.replace(/^home:\//, '');
+//      if (proc.args.file.zoomString)
+//	     iframe.src = src + proc.args.file.path.replace(/^home:\//, '');
+//	  else
+//	   		iframe.src = src + proc.args.file.path.replace(/^home:\//, '');
+	   		
       // Attach
       $content.appendChild(iframe);
       
